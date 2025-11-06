@@ -1,146 +1,108 @@
 grammar JavaScript;
 
 // ---------- PARSER RULES ----------
-program
-    : stmt* EOF
-    ;
+program: stmt* EOF;
 
-stmt
-    : variableDecl
-    | functionDecl
-    | ifStatement
-    | forStatement
-    | whileStatement
-    | returnStatement
-    | expressionStatement
-    | block
-    ;
+stmt:
+	variableDecl
+	| functionDecl
+	| ifStatement
+	| forStatement
+	| whileStatement
+	| returnStatement
+	| expressionStatement
+	| block;
 
-block
-    : '{' stmt* '}'
-    ;
+block: '{' stmt* '}';
 
-variableDecl
-    : ('let' | 'const' | 'var') Identifier ('=' expression)?';'
-    ;
+variableDecl: ('let' | 'const' | 'var') Identifier (
+		'=' expression
+	)? ';';
 
-functionDecl
-    : 'function' Identifier '(' parameterList? ')' block
-    ;
+functionDecl:
+	'function' Identifier '(' parameterList? ')' block;
 
-parameterList
-    : Identifier (',' Identifier)*
-    ;
+parameterList: Identifier (',' Identifier)*;
 
-ifStatement
-    : 'if' '(' expression ')' stmt (else stmt)?
-    ;
+ifStatement: 'if' '(' expression ')' stmt ('else' stmt)?;
 
-forStatement
-    : 'for' '(' (variableDecl | expressionStatement | ';')
-    expression? ';'
-    expression? ';'
-    ')' stmt
-    ;
+forStatement:
+	'for' '(' (variableDecl | expressionStatement | ';') expression? ';' expression? ';' ')' stmt;
 
-whileStatement
-    : 'while' '(' expression ')' stmt
-    ;
+whileStatement: 'while' '(' expression ')' stmt;
 
-returnStatement
-    : 'return' expression?';'
-    ;
+returnStatement: 'return' expression? ';';
+
+expressionStatement: expression ';';
 
 // ---------- EXPRESSIONS ----------
-expression
-    : assignmentExpression
-    ;
+expression: assignmentExpression;
 
-assignmentExpression
-    : leftHandSide '=' assignmentExpression
-    | logicalOrExpression
-    ;
+assignmentExpression:
+	leftHandSide '=' assignmentExpression
+	| logicalOrExpression;
 
-leftHandSide
-    : Identifier (('.' Identifier) | ('[' expression ']'))* 
-    ;
+leftHandSide:
+	Identifier (('.' Identifier) | ('[' expression ']'))*;
 
-logicalOrExpression
-    : logicalAndExpression ('||' logicalAndExpression)*
-    ;
+logicalOrExpression:
+	logicalAndExpression ('||' logicalAndExpression)*;
 
-logicalAndExpression
-    : equalityExpression ('&&' equalityExpression)*
-    ;
+logicalAndExpression:
+	equalityExpression ('&&' equalityExpression)*;
 
-equalityExpression
-    : relationalExpression (('==' | '!=' | '===') relationalExpression)*
-    ;
+equalityExpression:
+	relationalExpression (
+		('==' | '!=' | '===') relationalExpression
+	)*;
 
-relationalExpression
-    : additiveExpression (('>' | '<' | '>=' | '<=') additiveExpression)*
-    ; 
+relationalExpression:
+	additiveExpression (
+		('>' | '<' | '>=' | '<=') additiveExpression
+	)*;
 
-additiveExpression
-    : multiplicativeExpression (('+' | '-') multiplicativeExpression)*
-    ;
+additiveExpression:
+	multiplicativeExpression (
+		('+' | '-') multiplicativeExpression
+	)*;
 
-multiplicativeExpression
-    : unaryExpression (('*' | '/' | '%') unaryExpression)*
-    ;
+multiplicativeExpression:
+	unaryExpression (('*' | '/' | '%') unaryExpression)*;
 
-unaryExpression
-    : ('!' | '-' | '+') unaryExpression 
-    | primaryExpression 
-    ; 
+unaryExpression: ('!' | '-' | '+') unaryExpression
+	| primaryExpression;
 
-primaryExpression
-    : '(' expression ')' 
-    | literal 
-    | leftHandSide 
-    | functionCall 
-    | objectLiteral 
-    | arrayLiteral 
-    ; 
+primaryExpression:
+	'(' expression ')'
+	| literal
+	| leftHandSide
+	| functionCall
+	| objectLiteral
+	| arrayLiteral;
 
-functionCall
-    : leftHandSide '(' argumentList? ')'
-    ;
+functionCall: leftHandSide '(' argumentList? ')';
 
-argumentList
-    : expression (',' expression)*
-    ;
+argumentList: expression (',' expression)*;
 
-objectLiteral
-    : '{' (property (',' property)*)? '}'
-    ;
+objectLiteral: '{' (property (',' property)*)? '}';
 
-property
-    : Identifier ':' expression
-    ;
+property: Identifier ':' expression;
 
-arrayLiteral 
-    : '[' (expression (',' expression)*)? ']'
-    ;
-
-arrayLiteral
-    : '[' (expression (',' expression)*)? ']' // مصفوفة عناصر [1,2,3]
-    ;
+arrayLiteral: '[' (expression (',' expression)*)? ']';
 
 // ---------- LITERALS ----------
-literal
-    : BooleanLiteral
-    | StringLiteral
-    | NumberLiteral
-    | 'null'
-    ;
+literal:
+	BooleanLiteral
+	| StringLiteral
+	| NumberLiteral
+	| 'null';
 
 // ---------- LEXER RULES ----------
-BooleanLiteral : 'true' | 'false';
-StringLiteral  : '"' (~["\\\r\n])* '"' | '\'' (~['\\\r\n])* '\'';
-NumberLiteral  : [0-9]+ ('.' [0-9]+)?;
-Identifier     : [a-zA-Z_$][a-zA-Z0-9_$]*;
+BooleanLiteral: 'true' | 'false';
+StringLiteral: '"' (~["\\\r\n])* '"' | '\'' (~['\\\r\n])* '\'';
+NumberLiteral: [0-9]+ ('.' [0-9]+)?;
+Identifier: [a-zA-Z_$][a-zA-Z0-9_$]*;
 
-ws             : ' \t\n' -> skip;
-LINE_COMMENT   : '//'  ~[\r\n]* -> skip;
-BLOCK_COMMENT  : '/*' .*? '*/' -> skip;
+WS: [ \t\r\n]+ -> skip;
+LINE_COMMENT: '//' ~[\r\n]* -> skip;
+BLOCK_COMMENT: '/*' .*? '*/' -> skip;
